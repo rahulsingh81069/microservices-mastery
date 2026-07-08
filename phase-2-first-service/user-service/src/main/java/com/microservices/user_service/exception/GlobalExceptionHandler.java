@@ -33,4 +33,16 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
+
+
+    @ExceptionHandler(InvalidDataException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidData(InvalidDataException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "InvalidData");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }
