@@ -47,3 +47,8 @@ Lab test reports Service Lab reports management
         Lab Reports ka concern hai: test results, medical data, report generation
         Dono bilkul alag domain hain  ek "finance" hai, doosra "medical/clinical" hai
         Agar combine kiya, aur lab-report service ka load badha (bahut saare tests ho rahe hain), toh billing bhi slow ho jayega  jo galat hai, kyunki payment jaldi process hona chahiye
+
+Har naye Codespace session mein:
+1. mvn spring-boot:run
+2. PORTS tab → globe icon click → "Continue" accept karo
+3. Fresh URL copy karke Postman mein use karo
