@@ -43,3 +43,15 @@
     -> Yeh call kaise hoti hai?
 
         Yeh HTTP request ke through hoti hai bilkul waisa jaise Postman se hum apni service ko call karte the, waisa hi ek service doosri service ko call karti hai. Iska proper tarika (RestTemplate ya Feign Client) hum aage  seekhenge.
+
+
+Postman → Order Service (8083)
+              ↓
+              ├──→ HTTP Call → User Service (8081) → "User 1 valid hai" 
+              ├──→ HTTP Call → Product Service (8082) → "Product 1: price=55000" 
+              ↓
+         Order Service ne calculate kiya: 55000 × 2 = 110000
+              ↓
+         Order Service ne apni khud ki database mein save kiya
+              ↓
+         Response wapas Postman ko
