@@ -50,4 +50,23 @@
     Naya instance add karne ke liye saari doosri services ka code change karna padega
     Yeh bilkul non-scalable aur fragile approach hai -> real companies mein impossible hai isse manage karna jab 50-100 microservices ho 
 
+## Important Lesson - Framework Version Changes
+     spring-cloud-starter-gateway-server-webmvc (newer variant) uses:
+     spring.cloud.gateway.server.webmvc.routes[]
+
+     NOT:
+        spring.cloud.gateway.routes[] (old WebFlux variant)
+        spring.cloud.gateway.mvc.routes[] (deprecated intermediate version)
+
+> Lesson: Always check official Spring docs when framework behavior doesn't match expectations.
+
+
+> Ab tumhara pura architecture yeh hai:
+    
+    Client → API Gateway (8080) → Eureka se pata karta hai → User/Product/Order Service
+                                                              ↓
+                                                    (Order Service khud bhi
+                                                     Feign+Eureka se User/Product
+                                                     ko call karta hai)
+
 
