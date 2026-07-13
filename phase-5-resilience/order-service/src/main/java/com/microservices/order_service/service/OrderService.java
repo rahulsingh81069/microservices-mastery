@@ -11,30 +11,43 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import feign.FeignException;
 import com.microservices.order_service.exception.ServiceUnavailableException;
-
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 
 @Service
 public class OrderService {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private OrderRepository orderRepository; 
 
-    @Autowired
-    private UserClient userClient;
 
     @Autowired
     private ProductClient productClient;
 
-    public Order createOrder(Long userId, Long productId, Integer quantity) {
 
-        UserDTO user;
-        try {
-            user = userClient.getUserById(userId);
-        } catch (FeignException e) {
-                throw new ServiceUnavailableException("User Service is currently unavailable. Please try again later.");
+    @Autowired
+    private UserClient userClient;
+
+    @CircuitBreaker(name = "userServiceCB", fallbackMethod = "getUserFallback")
+    public UserDTO getUserWithCircuitBreaker(Long userId) {
+        return userClient.getUserById(userId);
+    }
+
+    public UserDTO getUserFallback(Long userId, Throwable throwable) {
+
+        if (throwable instanceof FeignException.NotFound) {
+            throw new ResourceNotFoundException("User not found with id: " + userId);
         }
 
+        throw new ServiceUnavailableException("User Service is currently unavailable. Please try again later.");
+    }
+
+
+
+    public Order createOrder(Long userId, Long productId, Integer quantity) {
+
+        UserDTO user=getUserWithCircuitBreaker(userId);
+        
         ProductDTO product;
         try {
             product = productClient.getProductById(productId);
