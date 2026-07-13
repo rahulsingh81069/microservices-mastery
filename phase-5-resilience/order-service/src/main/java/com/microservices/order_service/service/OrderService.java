@@ -1,60 +1,31 @@
 package com.microservices.order_service.service;
 
-import com.microservices.order_service.client.ProductClient;
 import com.microservices.order_service.client.ProductDTO;
-import com.microservices.order_service.client.UserClient;
 import com.microservices.order_service.client.UserDTO;
 import com.microservices.order_service.entity.Order;
 import com.microservices.order_service.exception.ResourceNotFoundException;
 import com.microservices.order_service.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import feign.FeignException;
-import com.microservices.order_service.exception.ServiceUnavailableException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+
 import java.util.List;
 
 @Service
 public class OrderService {
 
     @Autowired
-    private OrderRepository orderRepository; 
-
-
-    @Autowired
-    private ProductClient productClient;
-
+    private OrderRepository orderRepository;
 
     @Autowired
-    private UserClient userClient;
+    private UserServiceClient userServiceClient;
 
-    @CircuitBreaker(name = "userServiceCB", fallbackMethod = "getUserFallback")
-    public UserDTO getUserWithCircuitBreaker(Long userId) {
-        return userClient.getUserById(userId);
-    }
-
-    public UserDTO getUserFallback(Long userId, Throwable throwable) {
-
-        if (throwable instanceof FeignException.NotFound) {
-            throw new ResourceNotFoundException("User not found with id: " + userId);
-        }
-
-        throw new ServiceUnavailableException("User Service is currently unavailable. Please try again later.");
-    }
-
-
+    @Autowired
+    private ProductServiceClient productServiceClient;
 
     public Order createOrder(Long userId, Long productId, Integer quantity) {
 
-        UserDTO user=getUserWithCircuitBreaker(userId);
-        
-        ProductDTO product;
-        try {
-            product = productClient.getProductById(productId);
-        } catch (FeignException e) {
-            throw new ServiceUnavailableException("Product Service is currently unavailable. Please try again later.");
-        }
-
+        UserDTO user = userServiceClient.getUserById(userId);
+        ProductDTO product = productServiceClient.getProductById(productId);
 
         Double totalPrice = product.getPrice() * quantity;
 
