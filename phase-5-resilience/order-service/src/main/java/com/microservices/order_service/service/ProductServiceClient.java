@@ -8,13 +8,14 @@ import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import io.github.resilience4j.retry.annotation.Retry; 
 
 @Component
 public class ProductServiceClient {
 
     @Autowired
     private ProductClient productClient;
-
+    @Retry(name = "productServiceRetry")
     @CircuitBreaker(name = "productServiceCB", fallbackMethod = "getProductFallback")
     public ProductDTO getProductById(Long productId) {
         return productClient.getProductById(productId);

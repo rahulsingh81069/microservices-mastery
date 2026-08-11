@@ -8,17 +8,19 @@ import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import io.github.resilience4j.retry.annotation.Retry; 
 
 @Component
 public class UserServiceClient {
 
     @Autowired
     private UserClient userClient;
-
+    @Retry(name = "userServiceRetry")
     @CircuitBreaker(name = "userServiceCB", fallbackMethod = "getUserFallback")
     public UserDTO getUserById(Long userId) {
         return userClient.getUserById(userId);
     }
+
 
     public UserDTO getUserFallback(Long userId, Throwable throwable) {
         if (throwable instanceof FeignException.NotFound) {
