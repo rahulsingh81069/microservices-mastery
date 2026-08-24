@@ -64,3 +64,12 @@ Socho production mein User Service ka database password rotate karna hai (securi
 Code mein password hardcoded/properties file mein hai
 Password badalne ke liye naya build banao, naya deploy karo
 Agar 10 services same database use kar rahi hain, 10 baar yeh karna padega
+
+
+Sahi Startup Order (Ab Ka Naya Order)
+
+1. Config Server (8888)   ← sabse pehle, kyunki sab isी pe depend karenge
+2. Eureka Server (8761)
+3. User Service, Product Service 
+4. Order Service
+5. API Gateway
