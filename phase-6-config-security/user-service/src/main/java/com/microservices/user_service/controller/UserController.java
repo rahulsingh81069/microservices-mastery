@@ -5,6 +5,7 @@ import com.microservices.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.microservices.user_service.dto.UserResponseDTO;
 
 import java.util.List;
 
@@ -16,19 +17,44 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody User user) {
         User savedUser = userService.createUser(user);
-        return ResponseEntity.ok(savedUser);
+        UserResponseDTO responseDTO = new UserResponseDTO(
+            savedUser.getId(),
+            savedUser.getName(),
+            savedUser.getEmail(),
+            savedUser.getPhoneNumber(),
+            savedUser.getRole()
+      );
+        return ResponseEntity.ok(responseDTO);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        List<UserResponseDTO> responseDTOs = users.stream()
+                .map(user -> new UserResponseDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getPhoneNumber(),
+                        user.getRole()
+                ))
+                .toList();
+        return ResponseEntity.ok(responseDTOs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        UserResponseDTO responseDTO = new UserResponseDTO(
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            user.getPhoneNumber(),
+            user.getRole()
+        );
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")
