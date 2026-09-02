@@ -200,4 +200,17 @@ Yani debugging aur performance monitoring dono bahut easy ho jaate hain.
 - Performance bottlenecks aur failures identify karna bahut simple ho jata hai.
 
 
+## Important Lesson - Never commit downloaded tools/binaries to Git
+Zipkin JAR (129 MB) accidentally got committed, exceeded GitHub's 100MB limit.
+
+Fix:
+1. git reset --soft origin/main  (undo unpushed commits, keep changes staged)
+2. git reset HEAD <large-file>   (unstage the large file)
+3. Add it to .gitignore
+4. Re-commit cleanly and push
+
+Lesson: Only commit YOUR code (Java files, pom.xml, properties).
+Never commit downloaded tools/executables/binaries.
+
+
   
